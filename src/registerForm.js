@@ -57,13 +57,15 @@ export function buildRegisterForm({
       : null;
 
   return el('form', { class: 'item-form', onsubmit: handleSubmit }, [
-    el('h2', {}, isNew ? 'New register entry' : 'Register entry'),
-    isNew && initial['@id'] && el('p', { class: 'hint' }, 'No catalogue match was found for this scanned code.'),
-    el('label', {}, ['@id', idInput]),
-    isNew && el('p', { class: 'hint' }, 'A leading # is added automatically if omitted.'),
-    el('label', {}, ['Name', nameInput]),
-    el('label', {}, ['Description', descriptionInput]),
-    el('div', { class: 'form-actions' }, actions),
-    promoteSection,
+    el('div', { class: 'form-toolbar' }, actions),
+    el('div', { class: 'form-fields' }, [
+      el('h2', {}, isNew ? 'New register entry' : 'Register entry'),
+      isNew && initial['@id'] && el('p', { class: 'hint' }, 'No catalogue match was found for this scanned code.'),
+      el('label', {}, ['@id', idInput]),
+      isNew && el('p', { class: 'hint' }, 'A leading # is added automatically if omitted.'),
+      el('label', {}, ['Name', nameInput]),
+      el('label', {}, ['Description', descriptionInput]),
+      promoteSection,
+    ]),
   ]);
 }

@@ -57,15 +57,17 @@ export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
     'form',
     { class: 'item-form', onsubmit: handleSubmit },
     [
-      el('h2', {}, 'Catalogue entry'),
-      el('label', {}, ['@id', idInput]),
-      el('label', {}, ['Linked register id', registerIdInput]),
-      el('label', {}, ['@type', typeInput]),
-      el('label', {}, ['Name', nameInput]),
-      el('label', {}, ['Description', descriptionInput]),
-      el('label', {}, ['Date published', dateInput]),
-      el('label', {}, ['Author', authorInput]),
-      el('div', { class: 'form-actions' }, actions),
+      el('div', { class: 'form-toolbar' }, actions),
+      el('div', { class: 'form-fields' }, [
+        el('h2', {}, 'Catalogue entry'),
+        el('label', {}, ['@id', idInput]),
+        el('label', {}, ['Linked register id', registerIdInput]),
+        el('label', {}, ['@type', typeInput]),
+        el('label', {}, ['Name', nameInput]),
+        el('label', {}, ['Description', descriptionInput]),
+        el('label', {}, ['Date published', dateInput]),
+        el('label', {}, ['Author', authorInput]),
+      ]),
     ],
   );
 }

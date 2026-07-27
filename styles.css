@@ -253,10 +253,29 @@ input, textarea {
 }
 
 .item-form {
-  /* Extra clearance beyond env(safe-area-inset-bottom): some mobile browsers
-     (e.g. Arc) float a persistent toolbar over the page that isn't reported
-     as a safe-area inset, so a small buffer isn't enough to scroll past it. */
-  padding: 16px 16px calc(96px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Save/Cancel/Delete live outside the scrolling area entirely, right below
+   the header — some mobile browsers (e.g. Arc) float a toolbar over the
+   bottom of the page that doesn't scroll away and isn't reported via
+   env(safe-area-inset-bottom), so nothing bottom-anchored can be relied on
+   to ever be reachable. Top placement sidesteps that class of bug outright. */
+.form-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.form-fields {
+  padding: 16px 16px calc(24px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -314,7 +333,7 @@ button.danger {
   margin-left: auto;
 }
 
-.item-form > .form-actions button:not(.primary):not(.danger):not(.accent) {
+.item-form button:not(.primary):not(.danger):not(.accent) {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
