@@ -41,33 +41,26 @@ qrencode -o my-code.png -s 10 -m 2 "#reg-2023-014"
 
 ## Project structure
 
-```
-index.html          entry point, loads styles.css and src/main.js
-styles.css           all styles
-src/
-  main.js            bootstraps the app
-  app.js             state + render orchestration
-  dom.js             tiny hyperscript-style element builder — the only "framework" here
-  rocrate.js          RO-Crate helpers (crate model, CRUD, id generation)
-  storage.js          raw IndexedDB wrapper
-  fileIO.js           export (download) / import (file picker) of ro-crate-metadata.json
-  scanner.js          camera QR scanning, wraps the vendored qr-scanner library
-  listView.js          list screen builder
-  catalogueForm.js      catalogue entry form builder
-  registerForm.js       register entry form builder
-vendor/
-  qr-scanner.min.js + qr-scanner-worker.min.js   vendored from the qr-scanner npm package (ESM build, MIT licensed — see qr-scanner-LICENSE)
-```
+| file | description |
+| --- | --- |
+| index.html | entry point, loads styles.css and src/main.js |
+| styles.css | all styles |
+| src/ | source modules |
+| src/main.js | bootstraps the app |
+| src/app.js | state + render orchestration |
+| src/dom.js | tiny hyperscript-style element builder — the only "framework" here |
+| src/rocrate.js | RO-Crate helpers (crate model, CRUD, id generation) |
+| src/storage.js | raw IndexedDB wrapper |
+| src/fileIO.js | export (download) / import (file picker) of ro-crate-metadata.json |
+| src/scanner.js | camera QR scanning, wraps the vendored qr-scanner library |
+| src/listView.js | list screen builder |
+| src/catalogueForm.js | catalogue entry form builder |
+| src/registerForm.js | register entry form builder |
+| vendor/ | vendored libraries |
+| vendor/qr-scanner.min.js + vendor/qr-scanner-worker.min.js | vendored from the qr-scanner npm package (ESM build, MIT licensed — see qr-scanner-LICENSE) |
 
-There's no build step: `src/*.js` are loaded directly by the browser as ES modules (`<script type="module">`), and `scanner.js` imports the vendored `qr-scanner.min.js` the same way. No dependency manager involved at runtime.
 
-### Rendering approach
-
-`app.js` keeps a single mutable `state` object and a `setState(patch)` that merges the patch and calls `render()`. There's no virtual DOM — `render()` just rebuilds whichever screen is showing from scratch using real DOM APIs, which is cheap enough for a UI this size. Forms use native uncontrolled inputs (read via `.value` on submit), so typing into a field never triggers a re-render at all.
-
-The one thing that needs special handling is the camera: `render()` only tears down and recreates the live `QrScanner` instance when moving into or out of the "scan" screen, never on unrelated state changes (like a toast timing out), so the camera stream isn't restarted needlessly.
-
-## Running it
+## Running it locally
 
 Camera access requires a secure context (HTTPS or `localhost`) and ES module `<script>` tags require a real HTTP origin — you can't just double-click `index.html`. Serve the folder with any static file server, for example:
 
@@ -85,23 +78,20 @@ then open `http://localhost:4400` (or whatever port/tool you used).
 
 ### Testing on a phone over the same WiFi
 
-You need HTTPS to test camera access from another device on your network. Any static-server option with a `--ssl`/HTTPS flag works, or put a tool like `mkcert`-generated certs in front of the plain server. There's no `dev:mobile` script here since there's no build tool wiring it up — just point whatever HTTPS-capable static server you use at this folder.
+You need HTTPS to test camera access from another device on your network. Any static-server option with a `--ssl`/HTTPS flag works, or put a tool like `mkcert`-generated certs in front of the plain server.
 
 Quickest path, using `local-web-server` (no install required):
 
-1. Find your computer's local IP address (same WiFi network as the phone):
-   ```bash
-   ipconfig getifaddr en0   # macOS, adjust interface (en0/en1) as needed
-   ```
-2. From this folder, start an HTTPS static server:
+
+1. From this folder, start an HTTPS static server:
    ```bash
    npx local-web-server --https --port 4400
    ```
    This generates a self-signed certificate automatically.
-3. On the phone, open `https://<your-ip>:4400` (e.g. `https://192.168.1.64:4400`).
-4. Accept the certificate warning — it's self-signed, so the browser will flag it as untrusted:
+2. On the phone, open `https://<your-ip>:4400` (e.g. `https://192.168.1.64:4400`).
+3. Accept the certificate warning — it's self-signed, so the browser will flag it as untrusted:
    - Chrome/Android: **Advanced → Proceed**
    - Safari/iOS: **Show Details → visit this website**
-5. Allow camera access when prompted.
+4. Allow camera access when prompted.
 
 To avoid the warning entirely, generate a locally-trusted cert with `mkcert` (`brew install mkcert`) and point your static server at it instead.
