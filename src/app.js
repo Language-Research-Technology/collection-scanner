@@ -6,11 +6,12 @@ import {
   generateEntityId,
   getItems,
   removeItem,
+  ROOT_DATASET_ID,
   toEntityId,
   upsertItem,
 } from './rocrate.js';
 import { loadCatalogue, loadRegister, saveCatalogue, saveRegister } from './storage.js';
-import { downloadJson, pickJsonFile } from './fileIO.js';
+import { downloadJson, pickJsonFiles } from './fileIO.js';
 import { mountScanner } from './scanner.js';
 import { buildListView } from './listView.js';
 import { buildCatalogueForm } from './catalogueForm.js';
@@ -124,18 +125,46 @@ function handleCreateCatalogueFromRegister(regItem) {
   });
 }
 
-async function handleExport(kind) {
-  const crate = kind === 'catalogue' ? state.catalogue : state.register;
-  await downloadJson(`${kind}-ro-crate-metadata.json`, crate);
+async function handleExportData() {
+  await downloadJson('catalogue-ro-crate-metadata.json', state.catalogue);
+  await downloadJson('register-ro-crate-metadata.json', state.register);
 }
 
-async function handleImport(kind) {
-  const data = await pickJsonFile();
-  if (!data || typeof data !== 'object' || !('@graph' in data)) {
-    if (data !== null) alert('That file does not look like a valid ro-crate-metadata.json.');
+function identifyCrateKind(data) {
+  const root = data['@graph']?.find((n) => n['@id'] === ROOT_DATASET_ID);
+  if (root?.name === 'Catalogue') return 'catalogue';
+  if (root?.name === 'Register') return 'register';
+  return null;
+}
+
+async function handleImportData() {
+  const files = await pickJsonFiles();
+  if (!files) return;
+  if (files.length !== 2) {
+    alert('Select both the catalogue and register ro-crate-metadata.json files together.');
     return;
   }
-  await applyImportedData(kind, data, `Imported ${kind}`);
+
+  const crates = {};
+  for (const data of files) {
+    if (!data || typeof data !== 'object' || !('@graph' in data)) {
+      alert('One of the selected files does not look like a valid ro-crate-metadata.json.');
+      return;
+    }
+    const kind = identifyCrateKind(data);
+    if (!kind) {
+      alert('Could not tell which file is the catalogue and which is the register.');
+      return;
+    }
+    crates[kind] = data;
+  }
+  if (!crates.catalogue || !crates.register) {
+    alert('Select one catalogue file and one register file.');
+    return;
+  }
+
+  await Promise.all([saveCatalogue(crates.catalogue), saveRegister(crates.register)]);
+  setState({ catalogue: crates.catalogue, register: crates.register, toast: 'Imported data' });
 }
 
 async function handleLoadSampleData() {
@@ -158,16 +187,6 @@ async function handleReset() {
   const register = emptyCrate('Register', 'Register of scanned objects awaiting cataloguing');
   await Promise.all([saveCatalogue(catalogue), saveRegister(register)]);
   setState({ catalogue, register, toast: 'Cleared all data' });
-}
-
-async function applyImportedData(kind, data, toast) {
-  if (kind === 'catalogue') {
-    await saveCatalogue(data);
-    setState({ catalogue: data, toast });
-  } else {
-    await saveRegister(data);
-    setState({ register: data, toast });
-  }
 }
 
 // ---- rendering ----
@@ -269,15 +288,15 @@ function buildSetupScreen() {
       'Scan RO-Crate QR codes to catalogue and register items in your collection.',
     ),
     el('div', { class: 'setup-io' }, [
-      el('h2', {}, `Catalogue (${catalogueItems.length})`),
+      el('h2', {}, `Data (catalogue ${catalogueItems.length} · register ${registerItems.length})`),
+      el(
+        'p',
+        { class: 'hint' },
+        'Catalogue entries link back to register entries, so the two are always imported and exported together.',
+      ),
       el('div', { class: 'browse-io' }, [
-        el('button', { onclick: () => handleImport('catalogue') }, 'Import catalogue'),
-        el('button', { onclick: () => handleExport('catalogue') }, 'Export catalogue'),
-      ]),
-      el('h2', {}, `Register (${registerItems.length})`),
-      el('div', { class: 'browse-io' }, [
-        el('button', { onclick: () => handleImport('register') }, 'Import register'),
-        el('button', { onclick: () => handleExport('register') }, 'Export register'),
+        el('button', { onclick: handleImportData }, 'Import data'),
+        el('button', { onclick: handleExportData }, 'Export data'),
       ]),
     ]),
     el('hr', { class: 'setup-divider' }),

@@ -1,6 +1,6 @@
 # Sample data
 
-Two sample RO-Crates you can load into the app via **Browse → Import catalogue / Import register**:
+Two sample RO-Crates, loadable from the **Setup** screen — either **Load sample data** (one tap, loads these files directly) or **Import data** (pick these two files yourself):
 
 - `register/ro-crate-metadata.json` — 6 scanned objects: every object that has ever entered the collection, catalogued or not.
 - `catalogue/ro-crate-metadata.json` — 4 of those objects, now fully catalogued.
@@ -11,4 +11,4 @@ Every catalogue object starts life as a register entry. Cataloguing an object ("
 
 Item `@id`s use a leading `#` (e.g. `#reg-2023-014`), the standard RO-Crate convention for contextual entities that don't correspond to a real file — as opposed to the root dataset (`./`) or the metadata descriptor (`ro-crate-metadata.json`), which do. The app adds this prefix automatically for scanned codes and manually-typed ids if you don't type it yourself.
 
-These files aren't read by the app automatically — it stores data in the browser's IndexedDB. Use the Import buttons to load them in, or Export to write your own data back out in this same format.
+These files aren't read by the app automatically — it stores data in the browser's IndexedDB. Catalogue and register are always imported and exported together, since catalogue entries link back to register entries.

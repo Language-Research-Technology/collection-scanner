@@ -28,33 +28,44 @@ export async function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
-export function pickJsonFile() {
+export function pickJsonFiles() {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'application/json,.json';
+    input.multiple = true;
     input.style.display = 'none';
 
-    input.addEventListener('change', () => {
-      const file = input.files?.[0];
+    input.addEventListener('change', async () => {
+      const files = [...(input.files ?? [])];
       document.body.removeChild(input);
-      if (!file) {
+      if (files.length === 0) {
         resolve(null);
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          resolve(JSON.parse(reader.result));
-        } catch (err) {
-          reject(err);
-        }
-      };
-      reader.onerror = () => reject(reader.error);
-      reader.readAsText(file);
+      try {
+        resolve(await Promise.all(files.map(readJsonFile)));
+      } catch (err) {
+        reject(err);
+      }
     });
 
     document.body.appendChild(input);
     input.click();
+  });
+}
+
+function readJsonFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        resolve(JSON.parse(reader.result));
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
   });
 }
