@@ -18,6 +18,16 @@ export function buildRegisterForm({
   });
   const nameInput = el('input', { value: initial.name ?? '', required: true, autofocus: true });
   const descriptionInput = el('textarea', { value: initial.description ?? '', rows: 3 });
+  const rowInput = el('input', { type: 'number', value: initial['custom:row'] ?? '' });
+  const bayInput = el('input', { type: 'number', value: initial['custom:bay'] ?? '' });
+  const shelfInput = el('input', { type: 'number', value: initial['custom:shelf'] ?? '' });
+  const boxInput = el('input', { type: 'number', value: initial['custom:box'] ?? '' });
+
+  function setNumberField(item, key, input) {
+    const value = input.value.trim();
+    if (value) item[key] = Number(value);
+    else delete item[key];
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -28,6 +38,10 @@ export function buildRegisterForm({
     };
     const description = descriptionInput.value.trim();
     if (description) item.description = description;
+    setNumberField(item, 'custom:row', rowInput);
+    setNumberField(item, 'custom:bay', bayInput);
+    setNumberField(item, 'custom:shelf', shelfInput);
+    setNumberField(item, 'custom:box', boxInput);
     onSave(item);
   }
 
@@ -65,6 +79,12 @@ export function buildRegisterForm({
       isNew && el('p', { class: 'hint' }, 'A leading # is added automatically if omitted.'),
       el('label', {}, ['Name', nameInput]),
       el('label', {}, ['Description', descriptionInput]),
+      el('div', { class: 'form-row' }, [
+        el('label', {}, ['Row', rowInput]),
+        el('label', {}, ['Bay', bayInput]),
+        el('label', {}, ['Shelf', shelfInput]),
+        el('label', {}, ['Box', boxInput]),
+      ]),
       promoteSection,
     ]),
   ]);
