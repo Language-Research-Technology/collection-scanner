@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "collection-scanner-online",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4400}"],
+      "port": 4400,
+      "autoPort": true
+    }
+  ]
+}

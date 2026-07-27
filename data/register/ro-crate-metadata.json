@@ -1,0 +1,61 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "conformsTo": { "@id": "https://w3id.org/ro/crate/1.1" },
+      "about": { "@id": "./" }
+    },
+    {
+      "@id": "./",
+      "@type": "Dataset",
+      "name": "Register",
+      "description": "Sample register of every scanned object, catalogued or not",
+      "hasPart": [
+        { "@id": "#reg-2023-014" },
+        { "@id": "#reg-2023-021" },
+        { "@id": "#reg-2023-033" },
+        { "@id": "#reg-2023-047" },
+        { "@id": "#reg-2023-058" },
+        { "@id": "#reg-2023-061" }
+      ]
+    },
+    {
+      "@id": "#reg-2023-014",
+      "@type": "RegisterEntry",
+      "name": "Portrait of a Woman",
+      "description": "Studio portrait, sepia print, subject unidentified. (Already promoted to catalogue entry #cat-001.)"
+    },
+    {
+      "@id": "#reg-2023-021",
+      "@type": "RegisterEntry",
+      "name": "Bronze Horse Figurine",
+      "description": "Small cast bronze figurine of a standing horse, worn patina. (Already promoted to catalogue entry #cat-002.)"
+    },
+    {
+      "@id": "#reg-2023-033",
+      "@type": "RegisterEntry",
+      "name": "Handwritten Diary, Volume II",
+      "description": "Second of a three-volume handwritten diary, leather bound. (Already promoted to catalogue entry #cat-003.)"
+    },
+    {
+      "@id": "#reg-2023-047",
+      "@type": "RegisterEntry",
+      "name": "Ceramic Vase with Blue Glaze",
+      "description": "Found in storage, needs cataloguing. (Already promoted to catalogue entry #cat-004 — demonstrates the already-catalogued state.)"
+    },
+    {
+      "@id": "#reg-2023-058",
+      "@type": "RegisterEntry",
+      "name": "Wooden Carved Box",
+      "description": "Small carved wooden box, no visible maker's mark. Found during storeroom audit. Not yet catalogued — demonstrates the promote flow."
+    },
+    {
+      "@id": "#reg-2023-061",
+      "@type": "RegisterEntry",
+      "name": "Framed Certificate",
+      "description": "Framed award certificate, text partially faded. Needs research before cataloguing. Not yet catalogued."
+    }
+  ]
+}
