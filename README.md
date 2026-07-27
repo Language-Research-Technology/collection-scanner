@@ -17,7 +17,7 @@ Scan this QR code with your phone's camera to open it directly:
 
 ![QR code linking to the GitHub Pages deployment](images/github-pages-qr.png)
 
-Want to try the scanner itself without printing anything? [Sample QR codes](data/codes/) are hosted alongside the app — open that page on one device and scan the codes on it from another.
+Want to try the scanner itself without printing anything? [Sample QR codes](https://language-research-technology.github.io/collection-scanner/data/codes/) are hosted alongside the app — open that page on one device and scan the codes on it from another.
 
 ## How it works
 
