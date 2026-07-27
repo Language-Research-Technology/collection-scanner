@@ -159,6 +159,26 @@ input, textarea {
   color: #ff8080;
 }
 
+.setup {
+  padding: 24px 16px calc(16px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.setup-io h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.setup-io > h2 + .browse-io {
+  margin-bottom: 20px;
+}
+
 .browse {
   padding: 16px 16px calc(16px + var(--safe-bottom));
   display: flex;
@@ -172,6 +192,7 @@ input, textarea {
 
 .browse-io {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 

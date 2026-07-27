@@ -19,7 +19,7 @@ const state = {
   loading: true,
   catalogue: null,
   register: null,
-  view: 'scan', // 'scan' | 'browse'
+  view: 'setup', // 'setup' | 'scan' | 'browse'
   browseTab: 'catalogue', // 'catalogue' | 'register'
   detail: null,
   toast: null,
@@ -134,12 +134,26 @@ async function handleImport(kind) {
     if (data !== null) alert('That file does not look like a valid ro-crate-metadata.json.');
     return;
   }
+  await applyImportedData(kind, data, `Imported ${kind}`);
+}
+
+async function handleLoadSample(kind) {
+  const path = `data/${kind}/ro-crate-metadata.json`;
+  const res = await fetch(path);
+  if (!res.ok) {
+    alert(`Could not load sample ${kind} data.`);
+    return;
+  }
+  await applyImportedData(kind, await res.json(), `Loaded sample ${kind}`);
+}
+
+async function applyImportedData(kind, data, toast) {
   if (kind === 'catalogue') {
     await saveCatalogue(data);
-    setState({ catalogue: data, toast: `Imported ${kind}` });
+    setState({ catalogue: data, toast });
   } else {
     await saveRegister(data);
-    setState({ register: data, toast: `Imported ${kind}` });
+    setState({ register: data, toast });
   }
 }
 
@@ -154,10 +168,18 @@ function render() {
 function renderHeader() {
   clear(headerEl);
   headerEl.appendChild(
-    el('h1', {}, 'Collection Scanner'),
+    el('h1', {}, 'Scanner'),
   );
   headerEl.appendChild(
     el('nav', { class: 'tabs' }, [
+      el(
+        'button',
+        {
+          class: state.view === 'setup' ? 'active' : '',
+          onclick: () => setState({ view: 'setup' }),
+        },
+        'Setup',
+      ),
       el(
         'button',
         {
@@ -201,6 +223,11 @@ function renderMain() {
     return;
   }
 
+  if (state.view === 'setup' && state.detail === null) {
+    mainEl.appendChild(buildSetupScreen());
+    return;
+  }
+
   if (state.view === 'browse' && state.detail === null) {
     mainEl.appendChild(buildBrowseScreen());
     return;
@@ -217,6 +244,33 @@ function renderToast() {
 }
 
 // ---- screens ----
+
+function buildSetupScreen() {
+  const catalogueItems = getItems(state.catalogue);
+  const registerItems = getItems(state.register);
+
+  return el('div', { class: 'setup' }, [
+    el(
+      'p',
+      { class: 'hint' },
+      'Scan RO-Crate QR codes to catalogue and register items in your collection.',
+    ),
+    el('div', { class: 'setup-io' }, [
+      el('h2', {}, `Catalogue (${catalogueItems.length})`),
+      el('div', { class: 'browse-io' }, [
+        el('button', { onclick: () => handleImport('catalogue') }, 'Import catalogue'),
+        el('button', { onclick: () => handleExport('catalogue') }, 'Export catalogue'),
+        el('button', { onclick: () => handleLoadSample('catalogue') }, 'Load sample data'),
+      ]),
+      el('h2', {}, `Register (${registerItems.length})`),
+      el('div', { class: 'browse-io' }, [
+        el('button', { onclick: () => handleImport('register') }, 'Import register'),
+        el('button', { onclick: () => handleExport('register') }, 'Export register'),
+        el('button', { onclick: () => handleLoadSample('register') }, 'Load sample data'),
+      ]),
+    ]),
+  ]);
+}
 
 function buildBrowseScreen() {
   const catalogueItems = getItems(state.catalogue);
@@ -239,11 +293,6 @@ function buildBrowseScreen() {
       },
       `Register (${registerItems.length})`,
     ),
-  ]);
-
-  const io = el('div', { class: 'browse-io' }, [
-    el('button', { onclick: () => handleExport(state.browseTab) }, `Export ${state.browseTab}`),
-    el('button', { onclick: () => handleImport(state.browseTab) }, `Import ${state.browseTab}`),
   ]);
 
   const body =
@@ -276,7 +325,7 @@ function buildBrowseScreen() {
           emptyMessage: 'No register entries yet.',
         });
 
-  return el('div', { class: 'browse' }, [tabs, io, body]);
+  return el('div', { class: 'browse' }, [tabs, body]);
 }
 
 function buildDetailScreen(detail) {
