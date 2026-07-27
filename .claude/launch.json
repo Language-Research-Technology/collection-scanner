@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "collection-scanner-online",
+      "name": "collection-scanner",
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4400}"],
       "port": 4400,
