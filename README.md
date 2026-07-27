@@ -28,6 +28,17 @@ Want to try the scanner itself without printing anything? [Sample QR codes](data
 
 See [data/](data/) for sample crates and QR codes, and the top-level README there for more on the data model.
 
+## Generating QR codes
+
+A code encodes nothing but a plain-text `@id` string — no URL, no JSON, just the exact value the scanner matches against the register (e.g. `#reg-2023-014`). Any QR generator works; for example, with [`qrencode`](https://fukuchi.org/works/qrencode/):
+
+```bash
+qrencode -o my-code.png -s 10 -m 2 "#reg-2023-014"
+```
+
+- **Code for an existing item** — encode that register entry's `@id` value exactly as it appears in `ro-crate-metadata.json`, including the leading `#`.
+- **Code for a new item** — pick any `@id` string not already used in the register (following the same `#`-prefixed convention) and encode it. Scanning it won't match anything, so the app opens the "create new register entry" flow pre-filled with that id — see `#new-001` / `#new-002` in [data/codes/](data/codes/) for examples.
+
 ## Project structure
 
 ```
