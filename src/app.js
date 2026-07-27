@@ -1,5 +1,6 @@
 import { el, clear } from './dom.js';
 import {
+  emptyCrate,
   findByRegisterId,
   findItem,
   generateEntityId,
@@ -137,14 +138,26 @@ async function handleImport(kind) {
   await applyImportedData(kind, data, `Imported ${kind}`);
 }
 
-async function handleLoadSample(kind) {
-  const path = `data/${kind}/ro-crate-metadata.json`;
-  const res = await fetch(path);
-  if (!res.ok) {
-    alert(`Could not load sample ${kind} data.`);
+async function handleLoadSampleData() {
+  const [catalogueRes, registerRes] = await Promise.all([
+    fetch('data/catalogue/ro-crate-metadata.json'),
+    fetch('data/register/ro-crate-metadata.json'),
+  ]);
+  if (!catalogueRes.ok || !registerRes.ok) {
+    alert('Could not load sample data.');
     return;
   }
-  await applyImportedData(kind, await res.json(), `Loaded sample ${kind}`);
+  const [catalogue, register] = await Promise.all([catalogueRes.json(), registerRes.json()]);
+  await Promise.all([saveCatalogue(catalogue), saveRegister(register)]);
+  setState({ catalogue, register, toast: 'Loaded sample data' });
+}
+
+async function handleReset() {
+  if (!confirm('Clear all catalogue and register data? This cannot be undone.')) return;
+  const catalogue = emptyCrate('Catalogue', 'Collection catalogue of accessioned objects');
+  const register = emptyCrate('Register', 'Register of scanned objects awaiting cataloguing');
+  await Promise.all([saveCatalogue(catalogue), saveRegister(register)]);
+  setState({ catalogue, register, toast: 'Cleared all data' });
 }
 
 async function applyImportedData(kind, data, toast) {
@@ -260,13 +273,19 @@ function buildSetupScreen() {
       el('div', { class: 'browse-io' }, [
         el('button', { onclick: () => handleImport('catalogue') }, 'Import catalogue'),
         el('button', { onclick: () => handleExport('catalogue') }, 'Export catalogue'),
-        el('button', { onclick: () => handleLoadSample('catalogue') }, 'Load sample data'),
       ]),
       el('h2', {}, `Register (${registerItems.length})`),
       el('div', { class: 'browse-io' }, [
         el('button', { onclick: () => handleImport('register') }, 'Import register'),
         el('button', { onclick: () => handleExport('register') }, 'Export register'),
-        el('button', { onclick: () => handleLoadSample('register') }, 'Load sample data'),
+      ]),
+    ]),
+    el('hr', { class: 'setup-divider' }),
+    el('div', { class: 'setup-io' }, [
+      el('h2', {}, 'Sample data'),
+      el('div', { class: 'browse-io' }, [
+        el('button', { onclick: handleLoadSampleData }, 'Load sample data'),
+        el('button', { class: 'danger', onclick: handleReset }, 'Reset'),
       ]),
     ]),
   ]);
