@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sample QR codes — Collection Scanner</title>
+    <style>
+      :root {
+        --text: #6b6375;
+        --text-h: #08060d;
+        --bg: #fff;
+        --surface: #f7f6f9;
+        --border: #e5e4e7;
+        --accent: #aa3bff;
+        --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+        --mono: ui-monospace, Consolas, monospace;
+        color-scheme: light dark;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #9ca3af;
+          --text-h: #f3f4f6;
+          --bg: #16171d;
+          --surface: #1c1d24;
+          --border: #2e303a;
+          --accent: #c084fc;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font: 16px/145% var(--sans);
+        color: var(--text);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+
+      h1 {
+        color: var(--text-h);
+        font-size: 22px;
+        margin: 0 0 8px;
+      }
+
+      p.intro {
+        max-width: 60ch;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+      }
+
+      .card img {
+        width: 160px;
+        height: 160px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 8px;
+      }
+
+      .card .id {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text-h);
+        font-weight: 600;
+      }
+
+      .card .name {
+        font-weight: 600;
+        color: var(--text-h);
+      }
+
+      .card .note {
+        font-size: 13px;
+      }
+
+      .card .status {
+        display: inline-block;
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+      }
+
+      .status.new {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Sample QR codes</h1>
+      <p class="intro">
+        Test codes for the <a href="../../">Collection Scanner</a> app. Open the app on your
+        phone, tap <strong>Scan</strong>, then point the camera at one of these codes on this
+        screen (or print them out). Each one encodes a register entry's <code>@id</code>.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <img src="reg-2023-014.png" alt="QR code for #reg-2023-014" />
+          <div class="id">#reg-2023-014</div>
+          <div class="name">Portrait of a Woman</div>
+          <span class="status">Catalogued</span>
+        </div>
+
+        <div class="card">
+          <img src="reg-2023-021.png" alt="QR code for #reg-2023-021" />
+          <div class="id">#reg-2023-021</div>
+          <div class="name">Bronze Horse Figurine</div>
+          <span class="status">Catalogued</span>
+        </div>
+
+        <div class="card">
+          <img src="reg-2023-033.png" alt="QR code for #reg-2023-033" />
+          <div class="id">#reg-2023-033</div>
+          <div class="name">Handwritten Diary, Volume II</div>
+          <span class="status">Catalogued</span>
+        </div>
+
+        <div class="card">
+          <img src="reg-2023-047.png" alt="QR code for #reg-2023-047" />
+          <div class="id">#reg-2023-047</div>
+          <div class="name">Ceramic Vase with Blue Glaze</div>
+          <span class="status">Catalogued</span>
+        </div>
+
+        <div class="card">
+          <img src="reg-2023-058.png" alt="QR code for #reg-2023-058" />
+          <div class="id">#reg-2023-058</div>
+          <div class="name">Wooden Carved Box</div>
+          <span class="status">Register only</span>
+          <p class="note">Not yet catalogued — scan it to try "Create catalogue entry".</p>
+        </div>
+
+        <div class="card">
+          <img src="reg-2023-061.png" alt="QR code for #reg-2023-061" />
+          <div class="id">#reg-2023-061</div>
+          <div class="name">Framed Certificate</div>
+          <span class="status">Register only</span>
+          <p class="note">Not yet catalogued — scan it to try "Create catalogue entry".</p>
+        </div>
+
+        <div class="card">
+          <img src="new-001.png" alt="QR code for #new-001" />
+          <div class="id">#new-001</div>
+          <span class="status new">Unassigned</span>
+          <p class="note">Doesn't exist in the sample data — scan it to try the "new register entry" flow.</p>
+        </div>
+
+        <div class="card">
+          <img src="new-002.png" alt="QR code for #new-002" />
+          <div class="id">#new-002</div>
+          <span class="status new">Unassigned</span>
+          <p class="note">Doesn't exist in the sample data — scan it to try the "new register entry" flow.</p>
+        </div>
+      </div>
+
+      <p class="intro">
+        The sample data itself (needed before any of these codes will match) can be loaded from
+        the app's <strong>Setup</strong> screen — use "Load sample data" for both Catalogue and
+        Register.
+      </p>
+    </main>
+  </body>
+</html>

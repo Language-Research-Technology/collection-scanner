@@ -7,6 +7,18 @@ A camera-based QR scanner for an [RO-Crate](https://www.researchobject.org/ro-cr
 - Use real cat IDs
 - Use real cat properties
 
+## Use it online
+
+The app is hosted on GitHub Pages, so you can use it without running anything locally:
+
+**https://language-research-technology.github.io/collection-scanner/**
+
+Scan this QR code with your phone's camera to open it directly:
+
+![QR code linking to the GitHub Pages deployment](images/github-pages-qr.png)
+
+Want to try the scanner itself without printing anything? [Sample QR codes](data/codes/) are hosted alongside the app — open that page on one device and scan the codes on it from another.
+
 ## How it works
 
 - **Scan** a QR code with the device camera. It's looked up by `@id` in the **register**: found and already promoted → opens the linked **catalogue** entry; found, not yet promoted → opens that **register** entry; not found at all → creates a new register entry pre-filled with the scanned code.
