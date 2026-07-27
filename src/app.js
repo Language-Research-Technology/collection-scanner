@@ -307,7 +307,7 @@ function buildBrowseScreen() {
             rows: catalogueItems.map((i) => ({
               id: i['@id'],
               primary: i.name || i['@id'],
-              secondary: i.author ? `by ${i.author}` : i['@id'],
+              secondary: i['@id'],
             })),
             onSelect: (id) => setState({ detail: { kind: 'catalogue-edit', item: findItem(state.catalogue, id) } }),
             emptyMessage: 'No catalogue entries yet.',
