@@ -176,7 +176,7 @@ function renderHeader() {
         'button',
         {
           class: state.view === 'setup' ? 'active' : '',
-          onclick: () => setState({ view: 'setup' }),
+          onclick: () => setState({ view: 'setup', detail: null }),
         },
         'Setup',
       ),
@@ -184,7 +184,7 @@ function renderHeader() {
         'button',
         {
           class: state.view === 'scan' ? 'active' : '',
-          onclick: () => setState({ view: 'scan' }),
+          onclick: () => setState({ view: 'scan', detail: null }),
         },
         'Scan',
       ),
@@ -192,7 +192,7 @@ function renderHeader() {
         'button',
         {
           class: state.view === 'browse' ? 'active' : '',
-          onclick: () => setState({ view: 'browse' }),
+          onclick: () => setState({ view: 'browse', detail: null }),
         },
         'Browse',
       ),
