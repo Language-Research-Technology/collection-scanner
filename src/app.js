@@ -119,6 +119,10 @@ function handleCreateCatalogueFromRegister(regItem) {
       presetRegisterId: regItem['@id'],
       presetName: regItem.name,
       presetDescription: regItem.description,
+      presetRow: regItem['custom:row'],
+      presetBay: regItem['custom:bay'],
+      presetShelf: regItem['custom:shelf'],
+      presetBox: regItem['custom:box'],
     },
   });
 }
@@ -345,6 +349,10 @@ function buildDetailScreen(detail) {
           ...(detail.presetName ? { name: detail.presetName } : {}),
           ...(detail.presetDescription ? { description: detail.presetDescription } : {}),
           'custom:registerId': detail.presetRegisterId,
+          ...(detail.presetRow != null ? { 'custom:row': detail.presetRow } : {}),
+          ...(detail.presetBay != null ? { 'custom:bay': detail.presetBay } : {}),
+          ...(detail.presetShelf != null ? { 'custom:shelf': detail.presetShelf } : {}),
+          ...(detail.presetBox != null ? { 'custom:box': detail.presetBox } : {}),
         },
         onSave: handleSaveCatalogueItem,
         onCancel: () => setState({ detail: null }),

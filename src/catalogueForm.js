@@ -24,6 +24,16 @@ export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
   const descriptionInput = el('textarea', { value: initial.description ?? '', rows: 3 });
   const dateInput = el('input', { type: 'date', value: initial.datePublished ?? '' });
   const authorInput = el('input', { value: initial.author ?? '' });
+  const rowInput = el('input', { type: 'number', value: initial['custom:row'] ?? '' });
+  const bayInput = el('input', { type: 'number', value: initial['custom:bay'] ?? '' });
+  const shelfInput = el('input', { type: 'number', value: initial['custom:shelf'] ?? '' });
+  const boxInput = el('input', { type: 'number', value: initial['custom:box'] ?? '' });
+
+  function setNumberField(item, key, input) {
+    const value = input.value.trim();
+    if (value) item[key] = Number(value);
+    else delete item[key];
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -42,6 +52,10 @@ export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
     const author = authorInput.value.trim();
     if (author) item.author = author;
     else delete item.author;
+    setNumberField(item, 'custom:row', rowInput);
+    setNumberField(item, 'custom:bay', bayInput);
+    setNumberField(item, 'custom:shelf', shelfInput);
+    setNumberField(item, 'custom:box', boxInput);
     onSave(item);
   }
 
@@ -67,6 +81,12 @@ export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
         el('label', {}, ['Description', descriptionInput]),
         el('label', {}, ['Date published', dateInput]),
         el('label', {}, ['Author', authorInput]),
+        el('div', { class: 'form-row' }, [
+          el('label', {}, ['Row', rowInput]),
+          el('label', {}, ['Bay', bayInput]),
+          el('label', {}, ['Shelf', shelfInput]),
+          el('label', {}, ['Box', boxInput]),
+        ]),
       ]),
     ],
   );
