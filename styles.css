@@ -253,7 +253,10 @@ input, textarea {
 }
 
 .item-form {
-  padding: 16px 16px calc(24px + var(--safe-bottom));
+  /* Extra clearance beyond env(safe-area-inset-bottom): some mobile browsers
+     (e.g. Arc) float a persistent toolbar over the page that isn't reported
+     as a safe-area inset, so a small buffer isn't enough to scroll past it. */
+  padding: 16px 16px calc(96px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: 14px;
