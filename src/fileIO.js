@@ -28,23 +28,22 @@ export async function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
-export function pickJsonFiles() {
+export function pickJsonFile() {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'application/json,.json';
-    input.multiple = true;
     input.style.display = 'none';
 
     input.addEventListener('change', async () => {
-      const files = [...(input.files ?? [])];
+      const file = input.files?.[0];
       document.body.removeChild(input);
-      if (files.length === 0) {
+      if (!file) {
         resolve(null);
         return;
       }
       try {
-        resolve(await Promise.all(files.map(readJsonFile)));
+        resolve(await readJsonFile(file));
       } catch (err) {
         reject(err);
       }

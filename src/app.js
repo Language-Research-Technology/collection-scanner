@@ -11,7 +11,7 @@ import {
   upsertItem,
 } from './rocrate.js';
 import { loadCatalogue, loadRegister, saveCatalogue, saveRegister } from './storage.js';
-import { downloadJson, pickJsonFiles } from './fileIO.js';
+import { downloadJson, pickJsonFile } from './fileIO.js';
 import { mountScanner } from './scanner.js';
 import { buildListView } from './listView.js';
 import { buildCatalogueForm } from './catalogueForm.js';
@@ -137,34 +137,26 @@ function identifyCrateKind(data) {
   return null;
 }
 
-async function handleImportData() {
-  const files = await pickJsonFiles();
-  if (!files) return;
-  if (files.length !== 2) {
-    alert('Select both the catalogue and register ro-crate-metadata.json files together.');
+async function handleImportCatalogue() {
+  const data = await pickJsonFile();
+  if (!data) return;
+  if (typeof data !== 'object' || !('@graph' in data) || identifyCrateKind(data) !== 'catalogue') {
+    alert('That file does not look like the catalogue crate.');
     return;
   }
+  await saveCatalogue(data);
+  setState({ catalogue: data, toast: 'Imported catalogue' });
+}
 
-  const crates = {};
-  for (const data of files) {
-    if (!data || typeof data !== 'object' || !('@graph' in data)) {
-      alert('One of the selected files does not look like a valid ro-crate-metadata.json.');
-      return;
-    }
-    const kind = identifyCrateKind(data);
-    if (!kind) {
-      alert('Could not tell which file is the catalogue and which is the register.');
-      return;
-    }
-    crates[kind] = data;
-  }
-  if (!crates.catalogue || !crates.register) {
-    alert('Select one catalogue file and one register file.');
+async function handleImportRegister() {
+  const data = await pickJsonFile();
+  if (!data) return;
+  if (typeof data !== 'object' || !('@graph' in data) || identifyCrateKind(data) !== 'register') {
+    alert('That file does not look like the register crate.');
     return;
   }
-
-  await Promise.all([saveCatalogue(crates.catalogue), saveRegister(crates.register)]);
-  setState({ catalogue: crates.catalogue, register: crates.register, toast: 'Imported data' });
+  await saveRegister(data);
+  setState({ register: data, toast: 'Imported register' });
 }
 
 async function handleLoadSampleData() {
@@ -289,13 +281,19 @@ function buildSetupScreen() {
     ),
     el('div', { class: 'setup-io' }, [
       el('h2', {}, `Data (catalogue ${catalogueItems.length} · register ${registerItems.length})`),
-      el(
-        'p',
-        { class: 'hint' },
-        'Catalogue entries link back to register entries, so the two are always imported and exported together.',
-      ),
       el('div', { class: 'browse-io' }, [
-        el('button', { onclick: handleImportData }, 'Import data'),
+        el(
+          'button',
+          { class: catalogueItems.length > 0 ? 'success' : '', onclick: handleImportCatalogue },
+          'Import catalogue',
+        ),
+        el(
+          'button',
+          { class: registerItems.length > 0 ? 'success' : '', onclick: handleImportRegister },
+          'Import register',
+        ),
+      ]),
+      el('div', { class: 'browse-io' }, [
         el('button', { onclick: handleExportData }, 'Export data'),
       ]),
     ]),

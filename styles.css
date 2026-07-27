@@ -7,6 +7,7 @@
   --accent: #aa3bff;
   --accent-bg: rgba(170, 59, 255, 0.1);
   --danger: #d63b3b;
+  --success: #1a8a4a;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
@@ -30,6 +31,7 @@
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
     --danger: #f87171;
+    --success: #4ade80;
   }
 }
 
@@ -250,6 +252,11 @@ input, textarea {
   min-height: 40px;
   border-radius: 6px;
   font-size: 14px;
+}
+
+.browse-io button.success {
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .list-view {
