@@ -120,7 +120,6 @@ function handleCreateCatalogueFromRegister(regItem) {
       presetId: generateEntityId(),
       presetRegisterId: regItem['@id'],
       presetName: regItem.name,
-      presetDescription: regItem.description,
     },
   });
 }
@@ -379,7 +378,6 @@ function buildDetailScreen(detail) {
         initial: {
           '@id': detail.presetId,
           ...(detail.presetName ? { name: detail.presetName } : {}),
-          ...(detail.presetDescription ? { description: detail.presetDescription } : {}),
           'custom:registerId': detail.presetRegisterId,
         },
         onSave: handleSaveCatalogueItem,
