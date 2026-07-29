@@ -16,12 +16,13 @@ import { mountScanner } from './scanner.js';
 import { buildListView } from './listView.js';
 import { buildCatalogueForm } from './catalogueForm.js';
 import { buildRegisterForm } from './registerForm.js';
+import { buildPrintScreen } from './printCodes.js';
 
 const state = {
   loading: true,
   catalogue: null,
   register: null,
-  view: 'setup', // 'setup' | 'scan' | 'browse'
+  view: 'setup', // 'setup' | 'scan' | 'browse' | 'print'
   browseTab: 'catalogue', // 'catalogue' | 'register'
   detail: null,
   toast: null,
@@ -219,6 +220,14 @@ function renderHeader() {
         },
         'Browse',
       ),
+      el(
+        'button',
+        {
+          class: state.view === 'print' ? 'active' : '',
+          onclick: () => setState({ view: 'print', detail: null }),
+        },
+        'Print',
+      ),
     ]),
   );
 }
@@ -248,6 +257,11 @@ function renderMain() {
 
   if (state.view === 'setup' && state.detail === null) {
     mainEl.appendChild(buildSetupScreen());
+    return;
+  }
+
+  if (state.view === 'print' && state.detail === null) {
+    mainEl.appendChild(buildPrintScreen());
     return;
   }
 

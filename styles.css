@@ -105,6 +105,7 @@ input, textarea {
 .tabs,
 .browse-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -225,6 +226,114 @@ input, textarea {
   border-top: 1px solid var(--border);
   width: 100%;
   margin: 0;
+}
+
+.print-screen {
+  padding: 24px 16px calc(16px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.print-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.print-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-h);
+  max-width: 160px;
+}
+
+.print-controls label input {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.print-preview {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+  background: var(--surface);
+}
+
+.print-page {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell-w));
+  grid-auto-rows: var(--cell-h);
+  gap: var(--gap-y) var(--gap-x);
+  padding: var(--margin-top) 0 0 var(--margin-left);
+  width: var(--page-w);
+  background: #fff;
+  margin: 0 auto;
+}
+
+.print-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
+  padding: 2mm;
+  box-sizing: border-box;
+}
+
+.print-cell-qr {
+  width: var(--qr-size);
+  height: var(--qr-size);
+  flex-shrink: 0;
+}
+
+.print-cell-qr svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.print-cell-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: #000;
+  text-align: center;
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-page,
+  .print-page * {
+    visibility: visible;
+  }
+
+  .print-preview {
+    border: none;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .print-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 
 .browse {

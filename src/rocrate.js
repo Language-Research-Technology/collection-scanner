@@ -21,6 +21,20 @@ export function generateEntityId() {
   return toEntityId(crypto.randomUUID());
 }
 
+// Register ids use a separate scheme from catalogue ids (which are UUIDs and
+// due to change independently): the full SHA-256 hash of the generation time,
+// kept untruncated to avoid any collision risk. A counter is mixed in
+// alongside the timestamp so a tight loop generating many ids in the same
+// millisecond (e.g. a bulk print batch) can't collide.
+let registerIdCounter = 0;
+
+export async function generateRegisterId() {
+  const input = `${Date.now()}-${registerIdCounter++}`;
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return toEntityId(hex);
+}
+
 export function emptyCrate(name, description) {
   return {
     '@context': 'https://w3id.org/ro/crate/1.1/context',

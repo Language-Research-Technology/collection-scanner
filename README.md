@@ -39,6 +39,8 @@ qrencode -o my-code.png -s 10 -m 2 "#reg-2023-014"
 - **Code for an existing item** — encode that register entry's `@id` value exactly as it appears in `ro-crate-metadata.json`, including the leading `#`.
 - **Code for a new item** — pick any `@id` string not already used in the register (following the same `#`-prefixed convention) and encode it. Scanning it won't match anything, so the app opens the "create new register entry" flow pre-filled with that id — see `#new-001` / `#new-002` in [data/codes/](data/codes/) for examples.
 
+The **Print** screen in the app does this for you: it generates a batch of blank codes (fresh `#<uuid>` ids, matching the "new item" case above) and lays them out on a printable page, ready to stick onto objects ahead of time — scan one later to create its register entry. It ships with a default layout matching a common 63.5×33.9mm label sheet (3 columns × 8 rows on A4), or you can upload your own layout as a JSON file — use "Download example template" on that screen to get the exact shape to edit (`pageWidthMm`/`pageHeightMm`, `columns`/`rows`, `cellWidthMm`/`cellHeightMm`, `marginTopMm`/`marginLeftMm`, `gapXMm`/`gapYMm`).
+
 ## Project structure
 
 | file | description |
@@ -56,8 +58,10 @@ qrencode -o my-code.png -s 10 -m 2 "#reg-2023-014"
 | src/listView.js | list screen builder |
 | src/catalogueForm.js | catalogue entry form builder |
 | src/registerForm.js | register entry form builder |
+| src/printCodes.js | Print screen: generates blank codes and lays them out for printing |
 | vendor/ | vendored libraries |
 | vendor/qr-scanner.min.js + vendor/qr-scanner-worker.min.js | vendored from the qr-scanner npm package (ESM build, MIT licensed — see qr-scanner-LICENSE) |
+| vendor/qrcode-generator.mjs | vendored from the qrcode-generator npm package (dependency-free ES module, MIT licensed — see qrcode-generator-LICENSE) |
 
 
 ## Running it locally
