@@ -4,6 +4,7 @@ import {
   findByRegisterId,
   findItem,
   generateCatalogueId,
+  generateRegisterId,
   getItems,
   removeItem,
   ROOT_DATASET_ID,
@@ -76,7 +77,7 @@ function handleScan(code) {
     }
     return;
   }
-  setState({ detail: { kind: 'register-new', presetId: id } });
+  setState({ detail: { kind: 'register-new', presetId: id, fromScan: true } });
 }
 
 // ---- catalogue/register mutations ----
@@ -400,7 +401,7 @@ function buildBrowseScreen() {
             secondary: i['@id'],
           })),
           onSelect: (id) => setState({ detail: { kind: 'register-show', item: findItem(state.register, id) } }),
-          onNew: () => setState({ detail: { kind: 'register-new', presetId: '' } }),
+          onNew: async () => setState({ detail: { kind: 'register-new', presetId: await generateRegisterId() } }),
           newLabel: '+ New register entry',
           emptyMessage: 'No register entries yet.',
         });
@@ -472,6 +473,7 @@ function buildDetailScreen(detail) {
       return buildRegisterForm({
         initial: { '@id': detail.presetId },
         isNew: true,
+        fromScan: detail.fromScan ?? false,
         onSave: handleSaveRegisterItem,
         onCancel: () => setState({ detail: null }),
         catalogueEntryExists: false,
