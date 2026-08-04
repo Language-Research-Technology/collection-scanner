@@ -13,6 +13,30 @@ function stringToType(value) {
   return parts.length > 1 ? parts : parts[0] ?? 'Thing';
 }
 
+function field(label, value) {
+  return el('label', {}, [label, el('div', { class: 'field-value' }, value || '—')]);
+}
+
+export function buildCatalogueDetail({ item, onEdit, onCancel, onDelete }) {
+  const actions = [el('button', { class: 'primary', onclick: onEdit }, 'Edit'), el('button', { onclick: onCancel }, 'Back')];
+  if (onDelete) {
+    actions.push(el('button', { type: 'button', class: 'danger', onclick: onDelete }, 'Delete'));
+  }
+
+  return el('div', { class: 'item-form' }, [
+    el('div', { class: 'form-toolbar' }, actions),
+    el('div', { class: 'form-fields' }, [
+      el('h2', {}, 'Catalogue entry'),
+      field('@id', item['@id']),
+      field('Linked register id', item['custom:registerId']),
+      field('@type', typeToString(item['@type']) || 'Thing'),
+      field('Name', item.name),
+      field('Description', item.description),
+      field('Date published', item.datePublished),
+    ]),
+  ]);
+}
+
 export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
   const idInput = el('div', { class: 'field-value' }, initial['@id']);
   const registerIdInput = el('div', { class: 'field-value' }, initial['custom:registerId'] ?? '');

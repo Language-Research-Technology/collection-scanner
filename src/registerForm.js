@@ -17,6 +17,59 @@ function buildNumberSelect(current) {
   return el('select', {}, options);
 }
 
+function field(label, value) {
+  return el('label', {}, [label, el('div', { class: 'field-value' }, value ?? '—')]);
+}
+
+function buildPromoteSection({ onCreateCatalogueEntry, catalogueEntryExists, onViewCatalogueEntry }) {
+  if (!onCreateCatalogueEntry) return null;
+  return el('div', { class: 'form-actions' }, [
+    catalogueEntryExists
+      ? [
+          el(
+            'p',
+            { class: 'hint' },
+            'A catalogue entry already exists for this object. Delete that entry first if you need to remove this register record too.',
+          ),
+          onViewCatalogueEntry &&
+            el('button', { type: 'button', class: 'accent', onclick: onViewCatalogueEntry }, 'View catalogue entry'),
+        ]
+      : el('button', { type: 'button', class: 'accent', onclick: onCreateCatalogueEntry }, 'Create catalogue entry'),
+  ]);
+}
+
+export function buildRegisterDetail({
+  item,
+  onEdit,
+  onCancel,
+  onDelete,
+  onCreateCatalogueEntry,
+  catalogueEntryExists,
+  onViewCatalogueEntry,
+}) {
+  const actions = [el('button', { class: 'primary', onclick: onEdit }, 'Edit'), el('button', { onclick: onCancel }, 'Back')];
+  if (onDelete && !catalogueEntryExists) {
+    actions.push(el('button', { type: 'button', class: 'danger', onclick: onDelete }, 'Delete'));
+  }
+
+  return el('div', { class: 'item-form' }, [
+    el('div', { class: 'form-toolbar' }, actions),
+    el('div', { class: 'form-fields' }, [
+      el('h2', {}, 'Register entry'),
+      field('@id', item['@id']),
+      field('Name', item.name),
+      field('Format', item['dc:format']),
+      el('div', { class: 'form-row' }, [
+        field('Row', item['custom:row']),
+        field('Bay', item['custom:bay']),
+        field('Shelf', item['custom:shelf']),
+        field('Box', item['custom:box']),
+      ]),
+      buildPromoteSection({ onCreateCatalogueEntry, catalogueEntryExists, onViewCatalogueEntry }),
+    ]),
+  ]);
+}
+
 export function buildRegisterForm({
   initial,
   isNew,
@@ -67,22 +120,9 @@ export function buildRegisterForm({
     actions.push(el('button', { type: 'button', class: 'danger', onclick: onDelete }, 'Delete'));
   }
 
-  const promoteSection =
-    !isNew && onCreateCatalogueEntry
-      ? el('div', { class: 'form-actions' }, [
-          catalogueEntryExists
-            ? [
-                el(
-                  'p',
-                  { class: 'hint' },
-                  'A catalogue entry already exists for this object. Delete that entry first if you need to remove this register record too.',
-                ),
-                onViewCatalogueEntry &&
-                  el('button', { type: 'button', class: 'accent', onclick: onViewCatalogueEntry }, 'View catalogue entry'),
-              ]
-            : el('button', { type: 'button', class: 'accent', onclick: onCreateCatalogueEntry }, 'Create catalogue entry'),
-        ])
-      : null;
+  const promoteSection = isNew
+    ? null
+    : buildPromoteSection({ onCreateCatalogueEntry, catalogueEntryExists, onViewCatalogueEntry });
 
   return el('form', { class: 'item-form', onsubmit: handleSubmit }, [
     el('div', { class: 'form-toolbar' }, actions),

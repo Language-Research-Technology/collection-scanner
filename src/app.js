@@ -14,8 +14,8 @@ import { loadCatalogue, loadRegister, saveCatalogue, saveRegister } from './stor
 import { downloadJson, pickJsonFile } from './fileIO.js';
 import { mountScanner } from './scanner.js';
 import { buildListView } from './listView.js';
-import { buildCatalogueForm } from './catalogueForm.js';
-import { buildRegisterForm } from './registerForm.js';
+import { buildCatalogueDetail, buildCatalogueForm } from './catalogueForm.js';
+import { buildRegisterDetail, buildRegisterForm } from './registerForm.js';
 import { buildPrintScreen } from './printCodes.js';
 
 const state = {
@@ -70,9 +70,9 @@ function handleScan(code) {
   if (registerMatch) {
     const linkedCatalogueItem = findByRegisterId(state.catalogue, registerMatch['@id']);
     if (linkedCatalogueItem) {
-      setState({ detail: { kind: 'catalogue-edit', item: linkedCatalogueItem } });
+      setState({ detail: { kind: 'catalogue-show', item: linkedCatalogueItem } });
     } else {
-      setState({ detail: { kind: 'register-edit', item: registerMatch } });
+      setState({ detail: { kind: 'register-show', item: registerMatch } });
     }
     return;
   }
@@ -84,7 +84,7 @@ function handleScan(code) {
 async function handleSaveCatalogueItem(item) {
   const next = upsertItem(state.catalogue, item);
   await saveCatalogue(next);
-  setState({ catalogue: next, detail: null, toast: `Saved "${item.name}" to the catalogue` });
+  setState({ catalogue: next, detail: { kind: 'catalogue-show', item }, toast: `Saved "${item.name}" to the catalogue` });
 }
 
 async function handleDeleteCatalogueItem(id) {
@@ -97,7 +97,7 @@ async function handleDeleteCatalogueItem(id) {
 async function handleSaveRegisterItem(item) {
   const next = upsertItem(state.register, item);
   await saveRegister(next);
-  setState({ register: next, detail: null, toast: `Saved "${item.name}" to the register` });
+  setState({ register: next, detail: { kind: 'register-show', item }, toast: `Saved "${item.name}" to the register` });
 }
 
 async function handleDeleteRegisterItem(id) {
@@ -389,7 +389,7 @@ function buildBrowseScreen() {
               primary: i.name || i['@id'],
               secondary: i['@id'],
             })),
-            onSelect: (id) => setState({ detail: { kind: 'catalogue-edit', item: findItem(state.catalogue, id) } }),
+            onSelect: (id) => setState({ detail: { kind: 'catalogue-show', item: findItem(state.catalogue, id) } }),
             emptyMessage: 'No catalogue entries yet.',
           }),
         ])
@@ -399,7 +399,7 @@ function buildBrowseScreen() {
             primary: i.name || i['@id'],
             secondary: i['@id'],
           })),
-          onSelect: (id) => setState({ detail: { kind: 'register-edit', item: findItem(state.register, id) } }),
+          onSelect: (id) => setState({ detail: { kind: 'register-show', item: findItem(state.register, id) } }),
           onNew: () => setState({ detail: { kind: 'register-new', presetId: '' } }),
           newLabel: '+ New register entry',
           emptyMessage: 'No register entries yet.',
@@ -410,12 +410,20 @@ function buildBrowseScreen() {
 
 function buildDetailScreen(detail) {
   switch (detail.kind) {
+    case 'catalogue-show':
+      return buildCatalogueDetail({
+        item: detail.item,
+        onEdit: () => setState({ detail: { kind: 'catalogue-edit', item: detail.item } }),
+        onCancel: () => setState({ detail: null }),
+        onDelete: () => handleDeleteCatalogueItem(detail.item['@id']),
+      });
+
     case 'catalogue-edit':
       return buildCatalogueForm({
         initial: detail.item,
         onSave: handleSaveCatalogueItem,
         onDelete: () => handleDeleteCatalogueItem(detail.item['@id']),
-        onCancel: () => setState({ detail: null }),
+        onCancel: () => setState({ detail: { kind: 'catalogue-show', item: detail.item } }),
       });
 
     case 'catalogue-new':
@@ -429,6 +437,21 @@ function buildDetailScreen(detail) {
         onCancel: () => setState({ detail: null }),
       });
 
+    case 'register-show': {
+      const linkedCatalogueItem = findByRegisterId(state.catalogue, detail.item['@id']);
+      return buildRegisterDetail({
+        item: detail.item,
+        onEdit: () => setState({ detail: { kind: 'register-edit', item: detail.item } }),
+        onCancel: () => setState({ detail: null }),
+        onDelete: () => handleDeleteRegisterItem(detail.item['@id']),
+        onCreateCatalogueEntry: () => handleCreateCatalogueFromRegister(detail.item),
+        catalogueEntryExists: Boolean(linkedCatalogueItem),
+        onViewCatalogueEntry: linkedCatalogueItem
+          ? () => setState({ detail: { kind: 'catalogue-show', item: linkedCatalogueItem } })
+          : undefined,
+      });
+    }
+
     case 'register-edit': {
       const linkedCatalogueItem = findByRegisterId(state.catalogue, detail.item['@id']);
       return buildRegisterForm({
@@ -436,11 +459,11 @@ function buildDetailScreen(detail) {
         isNew: false,
         onSave: handleSaveRegisterItem,
         onDelete: () => handleDeleteRegisterItem(detail.item['@id']),
-        onCancel: () => setState({ detail: null }),
+        onCancel: () => setState({ detail: { kind: 'register-show', item: detail.item } }),
         onCreateCatalogueEntry: () => handleCreateCatalogueFromRegister(detail.item),
         catalogueEntryExists: Boolean(linkedCatalogueItem),
         onViewCatalogueEntry: linkedCatalogueItem
-          ? () => setState({ detail: { kind: 'catalogue-edit', item: linkedCatalogueItem } })
+          ? () => setState({ detail: { kind: 'catalogue-show', item: linkedCatalogueItem } })
           : undefined,
       });
     }
