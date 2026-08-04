@@ -89,20 +89,32 @@ then open `http://localhost:4400` (or whatever port/tool you used).
 
 ### Testing on a phone over the same WiFi
 
-You need HTTPS to test camera access from another device on your network. Any static-server option with a `--ssl`/HTTPS flag works, or put a tool like `mkcert`-generated certs in front of the plain server.
+You need HTTPS to test camera access from another device on your network. A plain self-signed cert (`npx local-web-server --https`) puts up a certificate warning you can click through, but **on Safari/iOS this often isn't enough** — WebKit can silently block camera access on a self-signed cert even after you've accepted the warning, since the cert chain itself isn't trusted by the system. It works fine on GitHub Pages (a real CA-issued cert) but not necessarily over a self-signed one on your LAN. Use [`mkcert`](https://github.com/FiloSottile/mkcert) instead — it generates a cert trusted by your machine's own certificate store, so there's no warning and no WebKit special-casing.
 
-Quickest path, using `local-web-server` (no install required):
-
-
-1. From this folder, start an HTTPS static server:
+1. Install `mkcert` and add its local CA to your system's trust store (one-time, needs your password):
    ```bash
-   npx local-web-server --https --port 4400
+   brew install mkcert
+   mkcert -install
    ```
-   This generates a self-signed certificate automatically.
-2. On the phone, open `https://<your-ip>:4400` (e.g. `https://192.168.1.64:4400`).
-3. Accept the certificate warning — it's self-signed, so the browser will flag it as untrusted:
-   - Chrome/Android: **Advanced → Proceed**
-   - Safari/iOS: **Show Details → visit this website**
-4. Allow camera access when prompted.
+2. From this folder, generate a cert covering `localhost` and your machine's LAN IP (find the IP with `ipconfig getifaddr en0`):
+   ```bash
+   mkdir -p .certs
+   mkcert -cert-file .certs/local-cert.pem -key-file .certs/local-key.pem localhost 127.0.0.1 <your-ip>
+   ```
+   `.certs/` is gitignored — regenerate it locally on each machine you test from rather than committing it.
+3. Start the server with that cert:
+   ```bash
+   npx local-web-server --port 4400 --key .certs/local-key.pem --cert .certs/local-cert.pem
+   ```
+4. **One-time per phone:** `mkcert -install` only trusts the CA on the machine you ran it on — the phone has never seen it and will still show a "connection not private" warning until it trusts the CA too. Get the CA's root cert onto the phone and install it there:
+   ```bash
+   cp "$(mkcert -CAROOT)/rootCA.pem" mkcert-rootCA.pem
+   ```
+   With the server above still running, open `https://<your-ip>:4400/mkcert-rootCA.pem` in Safari/Chrome on the phone — it'll offer to download a configuration profile. Then:
+   - **iOS:** Settings → (tap "Profile Downloaded" near the top) → **Install** → enter passcode → **Install** → **Install** → **Done**. Then Settings → General → About → scroll to the bottom → **Certificate Trust Settings** → toggle **full trust** on for the mkcert entry.
+   - **Android:** Settings → Security → Encryption & credentials → Install a certificate → CA certificate → select the downloaded file.
 
-To avoid the warning entirely, generate a locally-trusted cert with `mkcert` (`brew install mkcert`) and point your static server at it instead.
+   Delete `mkcert-rootCA.pem` from the project root afterward — it's just a temporary copy to get the file onto the phone over the same HTTPS connection, not something to keep around or commit.
+5. On the phone, open `https://<your-ip>:4400` (e.g. `https://192.168.1.64:4400`) — no certificate warning, and camera access should just work.
+
+If you'd rather not deal with `mkcert`, the plain self-signed route (`npx local-web-server --https --port 4400`, then click through the warning) still works for everything except camera access on Safari/iOS specifically.
