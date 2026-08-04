@@ -361,18 +361,18 @@ function buildBrowseScreen() {
     el(
       'button',
       {
-        class: state.browseTab === 'catalogue' ? 'active' : '',
-        onclick: () => setState({ browseTab: 'catalogue' }),
-      },
-      `Catalogue (${catalogueItems.length})`,
-    ),
-    el(
-      'button',
-      {
         class: state.browseTab === 'register' ? 'active' : '',
         onclick: () => setState({ browseTab: 'register' }),
       },
       `Register (${registerItems.length})`,
+    ),
+    el(
+      'button',
+      {
+        class: state.browseTab === 'catalogue' ? 'active' : '',
+        onclick: () => setState({ browseTab: 'catalogue' }),
+      },
+      `Catalogue (${catalogueItems.length})`,
     ),
   ]);
 
@@ -398,7 +398,7 @@ function buildBrowseScreen() {
           rows: registerItems.map((i) => ({
             id: i['@id'],
             primary: i.name || i['@id'],
-            secondary: i['@id'],
+            secondary: i['dc:format'] ?? '',
           })),
           onSelect: (id) => setState({ detail: { kind: 'register-show', item: findItem(state.register, id) } }),
           onNew: async () => setState({ detail: { kind: 'register-new', presetId: await generateRegisterId() } }),
