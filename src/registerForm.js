@@ -1,6 +1,22 @@
 import { el } from './dom.js';
 import { toEntityId } from './rocrate.js';
 
+const LOCATION_FIELD_MAX = 50;
+
+// A <select> is a native scrolling list of options — on iOS it's a spinning
+// wheel picker — so it covers "scrolling list of numbers" with no extra UI
+// library needed. Pre-selecting a value has to go through the `selected`
+// attribute on the matching <option>, since setting `value` on the <select>
+// element itself (the generic path `el()` would otherwise take) doesn't
+// select anything.
+function buildNumberSelect(current) {
+  const options = [el('option', { value: '', selected: current == null }, '—')];
+  for (let n = 1; n <= LOCATION_FIELD_MAX; n++) {
+    options.push(el('option', { value: n, selected: current === n }, String(n)));
+  }
+  return el('select', {}, options);
+}
+
 export function buildRegisterForm({
   initial,
   isNew,
@@ -18,10 +34,10 @@ export function buildRegisterForm({
   });
   const nameInput = el('input', { value: initial.name ?? '', required: true, autofocus: true });
   const formatInput = el('input', { value: initial['dc:format'] ?? '', placeholder: 'e.g. Photograph' });
-  const rowInput = el('input', { type: 'number', value: initial['custom:row'] ?? '' });
-  const bayInput = el('input', { type: 'number', value: initial['custom:bay'] ?? '' });
-  const shelfInput = el('input', { type: 'number', value: initial['custom:shelf'] ?? '' });
-  const boxInput = el('input', { type: 'number', value: initial['custom:box'] ?? '' });
+  const rowInput = buildNumberSelect(initial['custom:row'] ?? null);
+  const bayInput = buildNumberSelect(initial['custom:bay'] ?? null);
+  const shelfInput = buildNumberSelect(initial['custom:shelf'] ?? null);
+  const boxInput = buildNumberSelect(initial['custom:box'] ?? null);
 
   function setNumberField(item, key, input) {
     const value = input.value.trim();

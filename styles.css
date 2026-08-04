@@ -464,6 +464,7 @@ input, textarea {
 }
 
 .item-form input,
+.item-form select,
 .item-form textarea {
   padding: 10px;
   border: 1px solid var(--border);
