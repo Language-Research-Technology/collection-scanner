@@ -411,13 +411,18 @@ function buildBrowseScreen() {
 
 function buildDetailScreen(detail) {
   switch (detail.kind) {
-    case 'catalogue-show':
+    case 'catalogue-show': {
+      const linkedRegisterItem = findItem(state.register, detail.item['custom:registerId']);
       return buildCatalogueDetail({
         item: detail.item,
         onEdit: () => setState({ detail: { kind: 'catalogue-edit', item: detail.item } }),
         onCancel: () => setState({ detail: null }),
         onDelete: () => handleDeleteCatalogueItem(detail.item['@id']),
+        onViewRegisterEntry: linkedRegisterItem
+          ? () => setState({ detail: { kind: 'register-show', item: linkedRegisterItem } })
+          : undefined,
       });
+    }
 
     case 'catalogue-edit':
       return buildCatalogueForm({
@@ -461,11 +466,7 @@ function buildDetailScreen(detail) {
         onSave: handleSaveRegisterItem,
         onDelete: () => handleDeleteRegisterItem(detail.item['@id']),
         onCancel: () => setState({ detail: { kind: 'register-show', item: detail.item } }),
-        onCreateCatalogueEntry: () => handleCreateCatalogueFromRegister(detail.item),
         catalogueEntryExists: Boolean(linkedCatalogueItem),
-        onViewCatalogueEntry: linkedCatalogueItem
-          ? () => setState({ detail: { kind: 'catalogue-show', item: linkedCatalogueItem } })
-          : undefined,
       });
     }
 

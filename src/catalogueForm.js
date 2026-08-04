@@ -17,7 +17,14 @@ function field(label, value) {
   return el('label', {}, [label, el('div', { class: 'field-value' }, value || '—')]);
 }
 
-export function buildCatalogueDetail({ item, onEdit, onCancel, onDelete }) {
+function buildViewRegisterSection(onViewRegisterEntry) {
+  if (!onViewRegisterEntry) return null;
+  return el('div', { class: 'form-actions' }, [
+    el('button', { type: 'button', class: 'accent', onclick: onViewRegisterEntry }, 'View register entry'),
+  ]);
+}
+
+export function buildCatalogueDetail({ item, onEdit, onCancel, onDelete, onViewRegisterEntry }) {
   const actions = [el('button', { class: 'primary', onclick: onEdit }, 'Edit'), el('button', { onclick: onCancel }, 'Back')];
   if (onDelete) {
     actions.push(el('button', { type: 'button', class: 'danger', onclick: onDelete }, 'Delete'));
@@ -33,6 +40,7 @@ export function buildCatalogueDetail({ item, onEdit, onCancel, onDelete }) {
       field('Name', item.name),
       field('Description', item.description),
       field('Date published', item.datePublished),
+      buildViewRegisterSection(onViewRegisterEntry),
     ]),
   ]);
 }

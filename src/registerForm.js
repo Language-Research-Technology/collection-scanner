@@ -70,17 +70,7 @@ export function buildRegisterDetail({
   ]);
 }
 
-export function buildRegisterForm({
-  initial,
-  isNew,
-  fromScan,
-  onSave,
-  onDelete,
-  onCancel,
-  onCreateCatalogueEntry,
-  catalogueEntryExists,
-  onViewCatalogueEntry,
-}) {
+export function buildRegisterForm({ initial, isNew, fromScan, onSave, onDelete, onCancel, catalogueEntryExists }) {
   const idInput = isNew
     ? el('input', { value: initial['@id'] ?? '', required: true })
     : el('div', { class: 'field-value' }, initial['@id']);
@@ -121,10 +111,6 @@ export function buildRegisterForm({
     actions.push(el('button', { type: 'button', class: 'danger', onclick: onDelete }, 'Delete'));
   }
 
-  const promoteSection = isNew
-    ? null
-    : buildPromoteSection({ onCreateCatalogueEntry, catalogueEntryExists, onViewCatalogueEntry });
-
   return el('form', { class: 'item-form', onsubmit: handleSubmit }, [
     el('div', { class: 'form-toolbar' }, actions),
     el('div', { class: 'form-fields' }, [
@@ -141,7 +127,6 @@ export function buildRegisterForm({
         el('label', {}, ['Shelf', shelfInput]),
         el('label', {}, ['Box', boxInput]),
       ]),
-      promoteSection,
     ]),
   ]);
 }
