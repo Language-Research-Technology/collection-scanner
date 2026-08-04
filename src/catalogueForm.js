@@ -14,7 +14,7 @@ function stringToType(value) {
 }
 
 export function buildCatalogueForm({ initial, onSave, onDelete, onCancel }) {
-  const idInput = el('input', { value: initial['@id'], readonly: true });
+  const idInput = el('div', { class: 'field-value' }, initial['@id']);
   const registerIdInput = el('input', { value: initial['custom:registerId'] ?? '', readonly: true });
   const typeInput = el('input', {
     value: typeToString(initial['@type']) || 'Thing',

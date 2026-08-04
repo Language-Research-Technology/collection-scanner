@@ -27,11 +27,9 @@ export function buildRegisterForm({
   catalogueEntryExists,
   onViewCatalogueEntry,
 }) {
-  const idInput = el('input', {
-    value: initial['@id'] ?? '',
-    readonly: !isNew,
-    required: true,
-  });
+  const idInput = isNew
+    ? el('input', { value: initial['@id'] ?? '', required: true })
+    : el('div', { class: 'field-value' }, initial['@id']);
   const nameInput = el('input', { value: initial.name ?? '', required: true, autofocus: true });
   const formatInput = el('input', { value: initial['dc:format'] ?? '', placeholder: 'e.g. Photograph' });
   const rowInput = buildNumberSelect(initial['custom:row'] ?? null);
