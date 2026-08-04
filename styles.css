@@ -245,7 +245,14 @@ input, textarea {
   gap: 10px;
 }
 
-.print-controls label {
+.browse-io button.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.print-count-label {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -254,7 +261,7 @@ input, textarea {
   max-width: 160px;
 }
 
-.print-controls label input {
+.print-count-label input {
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -290,6 +297,7 @@ input, textarea {
   overflow: hidden;
   padding: 2mm;
   box-sizing: border-box;
+  break-inside: avoid;
 }
 
 .print-cell-qr {

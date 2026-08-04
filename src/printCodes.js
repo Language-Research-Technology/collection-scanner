@@ -3,39 +3,78 @@ import { el, clear } from './dom.js';
 import { generateRegisterId } from './rocrate.js';
 import { pickJsonFile, downloadJson } from './fileIO.js';
 
-// Matches a common sheet of 63.5x33.9mm labels (e.g. Avery 5160/L7160) on A4.
-// Anyone with different label stock can upload their own template instead —
-// see TEMPLATE_KEYS below for the shape.
-const DEFAULT_TEMPLATE = {
-  pageWidthMm: 210,
-  pageHeightMm: 297,
-  columns: 3,
-  rows: 8,
-  cellWidthMm: 63.5,
-  cellHeightMm: 33.9,
-  marginTopMm: 12,
-  marginLeftMm: 7,
-  gapXMm: 3,
-  gapYMm: 0,
-};
+const PAGE_WIDTH_MM = 210; // A4
+const PAGE_HEIGHT_MM = 297;
+const PAGE_MARGIN_MM = 10;
 
-const TEMPLATE_KEYS = Object.keys(DEFAULT_TEMPLATE);
+// "N per page" options map to a grid that evenly fills an A4 page. Anyone
+// with real label stock (specific cell sizes/margins) can upload an exact
+// template instead — see TEMPLATE_KEYS below for the shape.
+const LAYOUT_PRESETS = [
+  { count: 6, columns: 2, rows: 3 },
+  { count: 12, columns: 3, rows: 4 },
+  { count: 24, columns: 4, rows: 6 },
+  { count: 30, columns: 3, rows: 10 },
+];
+
+const TEMPLATE_KEYS = [
+  'pageWidthMm',
+  'pageHeightMm',
+  'columns',
+  'rows',
+  'cellWidthMm',
+  'cellHeightMm',
+  'marginTopMm',
+  'marginLeftMm',
+  'gapXMm',
+  'gapYMm',
+];
+
+function presetToTemplate({ columns, rows }) {
+  const printableWidth = PAGE_WIDTH_MM - PAGE_MARGIN_MM * 2;
+  const printableHeight = PAGE_HEIGHT_MM - PAGE_MARGIN_MM * 2;
+  return {
+    pageWidthMm: PAGE_WIDTH_MM,
+    pageHeightMm: PAGE_HEIGHT_MM,
+    columns,
+    rows,
+    cellWidthMm: printableWidth / columns,
+    cellHeightMm: printableHeight / rows,
+    marginTopMm: PAGE_MARGIN_MM,
+    marginLeftMm: PAGE_MARGIN_MM,
+    gapXMm: 0,
+    gapYMm: 0,
+  };
+}
 
 export function buildPrintScreen() {
-  let template = { ...DEFAULT_TEMPLATE };
+  let template = presetToTemplate(LAYOUT_PRESETS[1]); // 12 per page
   let codes = [];
 
-  const countInput = el('input', { type: 'number', value: 10, min: 1, max: 500 });
-  const templateStatus = el('span', { class: 'hint' }, 'Using default layout (63.5×33.9mm labels, 3×8 per A4 sheet)');
+  const countInput = el('input', { type: 'number', value: 12, min: 1, max: 500 });
+  const layoutStatus = el('span', { class: 'hint' });
   const previewArea = el('div', { class: 'print-preview' });
+  const presetButtons = new Map();
 
-  function applyTemplate(data) {
-    const next = { ...DEFAULT_TEMPLATE };
+  function applyPreset(preset) {
+    template = presetToTemplate(preset);
+    layoutStatus.textContent = `${preset.count} per A4 page (${preset.columns}×${preset.rows})`;
+    for (const [count, button] of presetButtons) {
+      button.classList.toggle('active', count === preset.count);
+    }
+    if (codes.length) renderPreview();
+  }
+
+  function applyCustomTemplate(data) {
+    const next = presetToTemplate(LAYOUT_PRESETS[1]);
     for (const key of TEMPLATE_KEYS) {
       const value = Number(data[key]);
       if (Number.isFinite(value) && value > 0) next[key] = value;
     }
     template = next;
+    layoutStatus.textContent = 'Using uploaded layout';
+    for (const button of presetButtons.values()) button.classList.remove('active');
+    if (codes.length) renderPreview();
   }
 
   async function handleUploadTemplate() {
@@ -45,13 +84,11 @@ export function buildPrintScreen() {
       alert('That file does not look like a valid layout template (expected a JSON object).');
       return;
     }
-    applyTemplate(data);
-    templateStatus.textContent = 'Using uploaded layout';
-    if (codes.length) renderPreview();
+    applyCustomTemplate(data);
   }
 
   function handleDownloadExampleTemplate() {
-    downloadJson('print-layout-template.json', DEFAULT_TEMPLATE);
+    downloadJson('print-layout-template.json', presetToTemplate(LAYOUT_PRESETS[1]));
   }
 
   async function handleGenerate() {
@@ -92,6 +129,12 @@ export function buildPrintScreen() {
     previewArea.appendChild(page);
   }
 
+  for (const preset of LAYOUT_PRESETS) {
+    const button = el('button', { onclick: () => applyPreset(preset) }, `${preset.count} per page`);
+    presetButtons.set(preset.count, button);
+  }
+  applyPreset(LAYOUT_PRESETS[1]);
+
   renderPreview();
 
   return el('div', { class: 'print-screen' }, [
@@ -101,19 +144,18 @@ export function buildPrintScreen() {
       'Generate a batch of blank QR codes to print and stick onto objects ahead of time — scanning one later creates its register entry.',
     ),
     el('div', { class: 'print-controls' }, [
-      el('label', {}, ['Number of codes', countInput]),
-      el('div', { class: 'browse-io' }, [
-        el('button', { class: 'primary', onclick: handleGenerate }, 'Generate'),
-        el('button', { onclick: () => window.print() }, 'Print'),
-      ]),
+      el('label', { class: 'print-count-label' }, ['Number of codes', countInput]),
+      el('div', { class: 'browse-io' }, [el('button', { class: 'primary', onclick: handleGenerate }, 'Generate')]),
     ]),
     el('div', { class: 'print-controls' }, [
-      templateStatus,
+      el('div', { class: 'browse-io' }, [...presetButtons.values()]),
       el('div', { class: 'browse-io' }, [
-        el('button', { onclick: handleUploadTemplate }, 'Upload print layout template'),
+        el('button', { onclick: handleUploadTemplate }, 'Upload custom layout template'),
         el('button', { onclick: handleDownloadExampleTemplate }, 'Download example template'),
       ]),
+      layoutStatus,
     ]),
+    el('div', { class: 'browse-io' }, [el('button', { class: 'primary', onclick: () => window.print() }, 'Print')]),
     previewArea,
   ]);
 }
