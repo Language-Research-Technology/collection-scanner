@@ -3,7 +3,7 @@ import {
   emptyCrate,
   findByRegisterId,
   findItem,
-  generateEntityId,
+  generateCatalogueId,
   getItems,
   removeItem,
   ROOT_DATASET_ID,
@@ -114,11 +114,11 @@ async function handleDeleteRegisterItem(id) {
   setState({ register: next, detail: null, toast: 'Register entry deleted' });
 }
 
-function handleCreateCatalogueFromRegister(regItem) {
+async function handleCreateCatalogueFromRegister(regItem) {
   setState({
     detail: {
       kind: 'catalogue-new',
-      presetId: generateEntityId(),
+      presetId: await generateCatalogueId(),
       presetRegisterId: regItem['@id'],
       presetName: regItem.name,
     },
@@ -220,14 +220,6 @@ function renderHeader() {
         },
         'Browse',
       ),
-      el(
-        'button',
-        {
-          class: state.view === 'print' ? 'active' : '',
-          onclick: () => setState({ view: 'print', detail: null }),
-        },
-        'Print',
-      ),
     ]),
   );
 }
@@ -316,6 +308,13 @@ function buildSetupScreen() {
       el('div', { class: 'browse-io' }, [
         el('button', { onclick: handleLoadSampleData }, 'Load sample data'),
         el('button', { class: 'danger', onclick: handleReset }, 'Reset'),
+      ]),
+    ]),
+    el('hr', { class: 'setup-divider' }),
+    el('div', { class: 'setup-io' }, [
+      el('h2', {}, 'Print'),
+      el('div', { class: 'browse-io' }, [
+        el('button', { onclick: () => setState({ view: 'print', detail: null }) }, 'Print QR codes'),
       ]),
     ]),
   ]);

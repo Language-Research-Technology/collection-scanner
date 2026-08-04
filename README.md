@@ -23,23 +23,30 @@ Want to try the scanner itself without printing anything? [Sample QR codes](http
 
 - **Scan** a QR code with the device camera. It's looked up by `@id` in the **register**: found and already promoted → opens the linked **catalogue** entry; found, not yet promoted → opens that **register** entry; not found at all → creates a new register entry pre-filled with the scanned code.
 - **Browse** toggles between the catalogue and the register.
-- **Promote to catalogue** gives the new catalogue entry its own freshly-generated `@id` (`crypto.randomUUID()`), linked back to the register entry via `custom:registerId`. Every catalogue `@id` is meant to have a register entry referencing it this way — catalogue entries can only be created by promoting a register entry, and a register entry can't be deleted once it's linked.
+- **Promote to catalogue** gives the new catalogue entry its own freshly-generated `@id` (see [Id schemes](#id-schemes) below), linked back to the register entry via `custom:registerId`. Every catalogue `@id` is meant to have a register entry referencing it this way — catalogue entries can only be created by promoting a register entry, and a register entry can't be deleted once it's linked.
 - Data lives in the browser's IndexedDB (hand-rolled wrapper, no `idb-keyval`) and round-trips to real `ro-crate-metadata.json` files via the **Export**/**Import** buttons.
 
 See [data/](data/) for sample crates and QR codes, and the top-level README there for more on the data model.
 
+### Id schemes
+
+Catalogue and register ids are generated independently, since the two are expected to evolve separately. Both follow the same `#<prefix>-<hash>` shape — a full, untruncated SHA-256 hash of the generation time (plus an internal counter, so generating many ids in the same millisecond — e.g. a Print batch — can't collide). No security property is needed here; SHA-256 was just the easiest hash already built into the browser.
+
+- **Catalogue** — `#cat-<hash>`, e.g. `#cat-606657315528fc7d7d5db17299d1f7c949c8d63955bd81735304aa436e472f6c`.
+- **Register** — `#reg-<hash>`, e.g. `#reg-7ba39b5294e21b7a6aecc2215ed8a32febabd28508d7871f4bbe87502edc9edc`.
+
 ## Generating QR codes
 
-A code encodes nothing but a plain-text `@id` string — no URL, no JSON, just the exact value the scanner matches against the register (e.g. `#reg-2023-014`). Any QR generator works; for example, with [`qrencode`](https://fukuchi.org/works/qrencode/):
+A code encodes nothing but a plain-text `@id` string — no URL, no JSON, just the exact value the scanner matches against the register (e.g. `#3fa71ae22cf0790a59ae4acac136c93a66378f539dcc85c9f673f3c313787a2f`). Any QR generator works; for example, with [`qrencode`](https://fukuchi.org/works/qrencode/):
 
 ```bash
-qrencode -o my-code.png -s 10 -m 2 "#reg-2023-014"
+qrencode -o my-code.png -s 10 -m 2 "#3fa71ae22cf0790a59ae4acac136c93a66378f539dcc85c9f673f3c313787a2f"
 ```
 
 - **Code for an existing item** — encode that register entry's `@id` value exactly as it appears in `ro-crate-metadata.json`, including the leading `#`.
-- **Code for a new item** — pick any `@id` string not already used in the register (following the same `#`-prefixed convention) and encode it. Scanning it won't match anything, so the app opens the "create new register entry" flow pre-filled with that id — see `#new-001` / `#new-002` in [data/codes/](data/codes/) for examples.
+- **Code for a new item** — pick any `@id` string not already used in the register (following the same `#`-prefixed convention) and encode it. Scanning it won't match anything, so the app opens the "create new register entry" flow pre-filled with that id — see the two "Unassigned" examples in [data/codes/](data/codes/).
 
-The **Print** screen in the app does this for you: it generates a batch of blank codes (fresh `#<uuid>` ids, matching the "new item" case above) and lays them out on a printable page, ready to stick onto objects ahead of time — scan one later to create its register entry. It ships with a default layout matching a common 63.5×33.9mm label sheet (3 columns × 8 rows on A4), or you can upload your own layout as a JSON file — use "Download example template" on that screen to get the exact shape to edit (`pageWidthMm`/`pageHeightMm`, `columns`/`rows`, `cellWidthMm`/`cellHeightMm`, `marginTopMm`/`marginLeftMm`, `gapXMm`/`gapYMm`).
+The **Print** screen in the app does this for you: choose how many blank codes to generate (fresh register-scheme ids — see [Id schemes](#id-schemes) below) and a layout — 6/12/24/30 per A4 page, evenly gridded — then print and stick them onto objects ahead of time; scan one later to create its register entry. For exact label stock, upload your own layout as a JSON file instead of a preset; use "Download example template" on that screen to get the exact shape to edit (`pageWidthMm`/`pageHeightMm`, `columns`/`rows`, `cellWidthMm`/`cellHeightMm`, `marginTopMm`/`marginLeftMm`, `gapXMm`/`gapYMm`).
 
 ## Project structure
 
@@ -58,7 +65,7 @@ The **Print** screen in the app does this for you: it generates a batch of blank
 | src/listView.js | list screen builder |
 | src/catalogueForm.js | catalogue entry form builder |
 | src/registerForm.js | register entry form builder |
-| src/printCodes.js | Print screen: generates blank codes and lays them out for printing |
+| src/printCodes.js | Print screen: generate blank codes and a page layout, then print them |
 | vendor/ | vendored libraries |
 | vendor/qr-scanner.min.js + vendor/qr-scanner-worker.min.js | vendored from the qr-scanner npm package (ESM build, MIT licensed — see qr-scanner-LICENSE) |
 | vendor/qrcode-generator.mjs | vendored from the qrcode-generator npm package (dependency-free ES module, MIT licensed — see qrcode-generator-LICENSE) |

@@ -16,16 +16,16 @@
       "name": "Register",
       "description": "Sample register of every scanned object, catalogued or not",
       "hasPart": [
-        { "@id": "#reg-2023-014" },
-        { "@id": "#reg-2023-021" },
-        { "@id": "#reg-2023-033" },
-        { "@id": "#reg-2023-047" },
-        { "@id": "#reg-2023-058" },
-        { "@id": "#reg-2023-061" }
+        { "@id": "#3fa71ae22cf0790a59ae4acac136c93a66378f539dcc85c9f673f3c313787a2f" },
+        { "@id": "#fcbb316871cf0cce96d0668ddbb7bbcc1f727771c46255de140e250ed5601376" },
+        { "@id": "#a50a946a7af6fe25b88986153e375d8ad034c4e847f653a598a1003c706b5fd7" },
+        { "@id": "#71bbb6bee2f7ceae3742fb8aa34c31447f074d09138b55c050446bb627e0e048" },
+        { "@id": "#3f9a34e3b90ba01b6c4836ad21041ec3bf549e8dd7e68da4c52abe1d99bf1ec3" },
+        { "@id": "#c0471ba2e7b13ea5ee4384c21240efadd2217a5ddf411db982d1c754b6dca691" }
       ]
     },
     {
-      "@id": "#reg-2023-014",
+      "@id": "#3fa71ae22cf0790a59ae4acac136c93a66378f539dcc85c9f673f3c313787a2f",
       "@type": "RegisterEntry",
       "name": "Portrait of a Woman",
       "dc:format": "Photograph",
@@ -35,7 +35,7 @@
       "custom:box": 3
     },
     {
-      "@id": "#reg-2023-021",
+      "@id": "#fcbb316871cf0cce96d0668ddbb7bbcc1f727771c46255de140e250ed5601376",
       "@type": "RegisterEntry",
       "name": "Bronze Horse Figurine",
       "dc:format": "Sculpture",
@@ -45,7 +45,7 @@
       "custom:box": 5
     },
     {
-      "@id": "#reg-2023-033",
+      "@id": "#a50a946a7af6fe25b88986153e375d8ad034c4e847f653a598a1003c706b5fd7",
       "@type": "RegisterEntry",
       "name": "Handwritten Diary, Volume II",
       "dc:format": "Manuscript",
@@ -55,7 +55,7 @@
       "custom:box": 2
     },
     {
-      "@id": "#reg-2023-047",
+      "@id": "#71bbb6bee2f7ceae3742fb8aa34c31447f074d09138b55c050446bb627e0e048",
       "@type": "RegisterEntry",
       "name": "Ceramic Vase with Blue Glaze",
       "dc:format": "Ceramic",
@@ -65,7 +65,7 @@
       "custom:box": 8
     },
     {
-      "@id": "#reg-2023-058",
+      "@id": "#3f9a34e3b90ba01b6c4836ad21041ec3bf549e8dd7e68da4c52abe1d99bf1ec3",
       "@type": "RegisterEntry",
       "name": "Wooden Carved Box",
       "dc:format": "Object",
@@ -75,7 +75,7 @@
       "custom:box": 4
     },
     {
-      "@id": "#reg-2023-061",
+      "@id": "#c0471ba2e7b13ea5ee4384c21240efadd2217a5ddf411db982d1c754b6dca691",
       "@type": "RegisterEntry",
       "name": "Framed Certificate",
       "dc:format": "Document",

@@ -12,27 +12,32 @@ export function toEntityId(raw) {
   return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
 }
 
+// Catalogue and register ids are generated independently, since the two are
+// expected to evolve on their own schedules. Both are a "prefix-hash" shape:
+// the full SHA-256 hash of the generation time, kept untruncated to avoid any
+// collision risk, with a counter mixed in alongside the timestamp so a tight
+// loop generating many ids in the same millisecond (e.g. a bulk print batch)
+// can't collide.
+let catalogueIdCounter = 0;
+let registerIdCounter = 0;
+
+async function hashGenerationTime(counter) {
+  const input = `${Date.now()}-${counter}`;
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /**
  * Catalogue entries get their own freshly-minted @id (they don't reuse the
  * register entry's id) — the link back to the register is carried instead by
  * the custom:registerId field.
  */
-export function generateEntityId() {
-  return toEntityId(crypto.randomUUID());
+export async function generateCatalogueId() {
+  return toEntityId(`cat-${await hashGenerationTime(catalogueIdCounter++)}`);
 }
 
-// Register ids use a separate scheme from catalogue ids (which are UUIDs and
-// due to change independently): the full SHA-256 hash of the generation time,
-// kept untruncated to avoid any collision risk. A counter is mixed in
-// alongside the timestamp so a tight loop generating many ids in the same
-// millisecond (e.g. a bulk print batch) can't collide.
-let registerIdCounter = 0;
-
 export async function generateRegisterId() {
-  const input = `${Date.now()}-${registerIdCounter++}`;
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-  const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
-  return toEntityId(hex);
+  return toEntityId(`reg-${await hashGenerationTime(registerIdCounter++)}`);
 }
 
 export function emptyCrate(name, description) {

@@ -25,7 +25,7 @@
       "name": "Portrait of a Woman",
       "description": "Studio portrait, sepia print, subject unidentified.",
       "datePublished": "1932-05-01",
-      "custom:registerId": "#reg-2023-014"
+      "custom:registerId": "#3fa71ae22cf0790a59ae4acac136c93a66378f539dcc85c9f673f3c313787a2f"
     },
     {
       "@id": "#cat-002",
@@ -33,7 +33,7 @@
       "name": "Bronze Horse Figurine",
       "description": "Small cast bronze figurine of a standing horse, worn patina.",
       "datePublished": "1890",
-      "custom:registerId": "#reg-2023-021"
+      "custom:registerId": "#fcbb316871cf0cce96d0668ddbb7bbcc1f727771c46255de140e250ed5601376"
     },
     {
       "@id": "#cat-003",
@@ -41,7 +41,7 @@
       "name": "Handwritten Diary, Volume II",
       "description": "Second of a three-volume handwritten diary, leather bound, water damage to first ten pages.",
       "datePublished": "1915-03-12",
-      "custom:registerId": "#reg-2023-033"
+      "custom:registerId": "#a50a946a7af6fe25b88986153e375d8ad034c4e847f653a598a1003c706b5fd7"
     },
     {
       "@id": "#cat-004",
@@ -49,7 +49,7 @@
       "name": "Ceramic Vase with Blue Glaze",
       "description": "19th century blue glazed ceramic vase, acquired 2023.",
       "datePublished": "2023-11-02",
-      "custom:registerId": "#reg-2023-047"
+      "custom:registerId": "#71bbb6bee2f7ceae3742fb8aa34c31447f074d09138b55c050446bb627e0e048"
     }
   ]
 }
