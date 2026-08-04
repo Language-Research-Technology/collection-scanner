@@ -181,6 +181,21 @@ async function handleReset() {
   setState({ catalogue, register, toast: 'Cleared all data' });
 }
 
+// A page can't force-reset browser permission state or re-trigger a cert
+// prompt (that's deliberately locked down so sites can't spam requests) —
+// but calling getUserMedia directly will show the native prompt if
+// permission is still undecided, or a clear error if it's blocked, which is
+// the closest thing to a "retry" available from here.
+async function handleTestCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    stream.getTracks().forEach((track) => track.stop());
+    setState({ toast: 'Camera access is working.' });
+  } catch (err) {
+    alert(`Camera test failed: ${err.name ?? 'Error'}${err.message ? ` — ${err.message}` : ''}`);
+  }
+}
+
 // ---- rendering ----
 
 function render() {
@@ -309,6 +324,23 @@ function buildSetupScreen() {
         el('button', { onclick: handleLoadSampleData }, 'Load sample data'),
         el('button', { class: 'danger', onclick: handleReset }, 'Reset'),
       ]),
+    ]),
+    el('hr', { class: 'setup-divider' }),
+    el('div', { class: 'setup-io' }, [
+      el('h2', {}, 'Camera access'),
+      el(
+        'p',
+        { class: 'hint' },
+        'A site can\'t reset your browser\'s camera permission itself — that has to happen in your browser settings. This retries access, which will show the permission prompt again if it\'s still undecided.',
+      ),
+      el('div', { class: 'browse-io' }, [
+        el('button', { onclick: handleTestCamera }, 'Test camera access'),
+      ]),
+      el(
+        'p',
+        { class: 'hint' },
+        'Still blocked? iOS Safari: tap the "aA" icon in the address bar → Website Settings → Camera → Allow. Android Chrome: tap the lock/info icon in the address bar → Permissions → Camera → Allow.',
+      ),
     ]),
     el('hr', { class: 'setup-divider' }),
     el('div', { class: 'setup-io' }, [
